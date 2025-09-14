@@ -54,7 +54,11 @@ const login = (req, res) => {
         if (results.rowCount !== 1) return res.cc('登录失败，用户名不存在')
         const compareResult = bcrypt.compareSync(userInfo.password, results.rows[0].password)
         if (!compareResult) return res.cc('登录失败，密码错误')
-        const user = { ...results.rows[0], password: '', user_pic: '' }   
+        const user = { ...results.rows[0], password: '', user_pic: '' }
+        // 确保用户对象包含必要的字段
+        if (!user.id) {
+            return res.cc('用户数据异常，缺少ID字段')
+        }
         const tokenStr = jwt.sign(user, config.jwtSecretKey, { expiresIn: '10h' })
         res.send({
             status: 0,
