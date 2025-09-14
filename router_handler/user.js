@@ -1,8 +1,10 @@
 const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 const db = require('../db')
+const config = require('../config')
 
 // 注册用户的处理函数
 const regUser = (req, res) => {
@@ -34,9 +36,9 @@ const regUser = (req, res) => {
 
             // 检查是否成功插入一条记录
             if (insertResult.rowCount === 1) {
-                res.cc('注册成功',0)
+                res.cc('注册成功', 0)
             } else {
-                res.cc('注册失败，请稍后重试',500)
+                res.cc('注册失败，请稍后重试', 500)
             }
         })
 
@@ -45,7 +47,21 @@ const regUser = (req, res) => {
 
 // 登录的处理函数  
 const login = (req, res) => {
-    res.send('登录成功')
+    const userInfo = req.body
+    const sql = `select * from "user" where username=$1`
+    db.query(sql, [userInfo.username], (err, results) => {
+        if (err) return res.cc(err)
+        if (results.rowCount !== 1) return res.cc('登录失败，用户名不存在')
+        const compareResult = bcrypt.compareSync(userInfo.password, results.rows[0].password)
+        if (!compareResult) return res.cc('登录失败，密码错误')
+        const user = { ...results.rows[0], password: '', user_pic: '' }   
+        const tokenStr = jwt.sign(user, config.jwtSecretKey, { expiresIn: '10h' })
+        res.send({
+            status: 0,
+            message: '登录成功',
+            token: 'Bearer ' + tokenStr
+        })
+    })
 }
 
 module.exports = {

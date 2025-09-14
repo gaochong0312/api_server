@@ -1,11 +1,16 @@
 const express = require('express')
 const app = express()
-const joi = require('@hapi/joi')
+
+app.use(express.json())
+app.use(express.urlencoded({extended:false}))
 
 const cors = require('cors')
 app.use(cors())
-app.use(express.json())
-app.use(express.urlencoded({extended:false}))
+
+const { expressjwt: expressJWT} = require('express-jwt')
+const config = require('./config')
+app.use(expressJWT({secret:config.jwtSecretKey,algorithms:['HS256']}).unless({path:[/^\/api\//]}))
+
 
 
 app.use(function(req,res,next){
@@ -18,14 +23,19 @@ app.use(function(req,res,next){
     next()
 })
 
+const joi = require('joi')
 app.use(function(err,req,res,next){
     if(err instanceof joi.ValidationError) return res.cc(err)
+    if(err.name === 'UnauthorizedError') return res.cc('身份认证失败！')
     res.cc(err)
 })
 
+
+
 const userRouter = require('./router/user')
 app.use('/api',userRouter)
-
+const userinfoRouter = require('./router/userinfo')
+app.use('/my',userinfoRouter)
 
 app.listen(3007,function(){
     console.log('server is running......')
