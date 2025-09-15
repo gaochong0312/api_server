@@ -1,24 +1,21 @@
 const express = require('express')
 const router = express.Router()
 const userHandler = require('../router_handler/user')
+const { validationResult } = require('express-validator')
 
-const Joi = require('joi')
-const { register_schema } = require('../schema/user')
+const { register_schema, login_schema } = require('../schema/user')
 
-router.post('/reguser',(req,res,next)=>{
-    const { error } = register_schema.body.validate(req.body)
-    if (error) {
-      return res.cc(error.details[0].message,400)
+// 验证结果处理中间件
+const handleValidationErrors = (req, res, next) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        return res.cc(errors.array()[0].msg, 400)
     }
     next()
-}, userHandler.regUser)
+}
 
-router.post('/login',(req,res,next)=>{
-    const { error } = register_schema.body.validate(req.body)
-    if (error) {
-      return res.cc(error.details[0].message,400)
-    }
-    next()
-}, userHandler.login)
+router.post('/reguser', register_schema, handleValidationErrors, userHandler.regUser)
+
+router.post('/login', login_schema, handleValidationErrors, userHandler.login)
 
 module.exports = router

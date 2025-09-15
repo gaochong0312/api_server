@@ -2,9 +2,9 @@ const db = require('../db')
 
 
 // 获取用户信息的处理函数
-const sql = `select id, username, nickname, email from "user" where id=$1`
+const sqlSelect = `select id, username, email from "user" where id=$1`
 const getUserInfo = (req, res) => {
-    db.query(sql, [req.user.id], (err, results) => {
+db.query(sqlSelect, [req.auth.id], (err, results) => {
         if (err) return res.cc(err)
         if (results.rowCount !== 1) return res.cc('获取用户信息失败')
         res.send({
@@ -14,6 +14,28 @@ const getUserInfo = (req, res) => {
         })
     })
 }
+
+const sqlUpdate = `update "user" set username=$1, email=$2 where id=$3`
+const updateUserInfo = (req, res) => {
+    db.query(sqlUpdate, [req.body.username, req.body.email, req.auth.id], (err, results) => { 
+        if (err) return res.cc(err)
+        if (results.rowCount !== 1) return res.cc('更新用户信息失败')
+        res.cc('更新用户信息成功', 0)
+    }) 
+}
+
+const sqlUpdatePwd = `update "user" set password=$1 where id=$2`
+const updatePwd = (req, res) => {
+    db.query(sqlUpdatePwd, [req.body.password, req.auth.id], (err, results) => {
+        if (err) return res.cc(err)
+        if (results.rowCount !== 1) return res.cc('更新密码失败')
+        res.cc('更新密码成功', 0)
+    })
+}
+
+
 module.exports = {
-    getUserInfo
+    getUserInfo,
+    updateUserInfo,
+    updatePwd
 }
