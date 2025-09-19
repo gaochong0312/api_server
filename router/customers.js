@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const customersHandler = require('../router_handler/customers')
 const { validationResult } = require('express-validator')
 const { add_schema } = require('../schema/customers')
 
@@ -10,9 +11,9 @@ const handleValidationErrors = (req, res, next) => {
     }
     next()
 }
+router.get('/list',customersHandler.list)
+router.post('/add',customersHandler.add)
 
-router.post('/add', add_schema, handleValidationErrors, (req, res) => {
 
-})
 
 module.exports = router

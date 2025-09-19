@@ -26,8 +26,8 @@ const userRouter = require('./router/user')
 app.use('/api',userRouter)
 const userinfoRouter = require('./router/userinfo')
 app.use('/my',userinfoRouter)
-const customerRouter = require('./router/customer')
-app.use('/customer',customerRouter)
+const customersRouter = require('./router/customers')
+app.use('/customers',customersRouter)
 
 
 app.use(function(err,req,res,next){
