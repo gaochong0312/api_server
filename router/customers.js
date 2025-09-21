@@ -13,6 +13,8 @@ const handleValidationErrors = (req, res, next) => {
 }
 router.get('/list',customersHandler.list)
 router.post('/add',customersHandler.add)
+router.get('/del/:id',customersHandler.del)
+router.post('/update',customersHandler.update)
 
 
 

@@ -55,7 +55,7 @@ const login = (req, res) => {
         const compareResult = bcrypt.compareSync(userInfo.password, results.rows[0].password)
         if (!compareResult) return res.cc('登录失败，密码错误')
         const user = { ...results.rows[0], password: '', user_pic: '' }   
-        const tokenStr = jwt.sign(user, config.jwtSecretKey, { expiresIn: '10h' })
+        const tokenStr = jwt.sign(user, config.jwtSecretKey, { expiresIn: '100h' })
         res.send({
             status: 0,
             message: '登录成功',
