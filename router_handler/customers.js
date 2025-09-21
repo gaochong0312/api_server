@@ -20,7 +20,7 @@ const add = (req, res) => {
         if (result.rowCount !== 1) return res.cc('添加用户失败')
         res.send({ 
             status: 0,
-            message: '添加成功111'
+            message: '添加成功'
         })
     })
 }   
